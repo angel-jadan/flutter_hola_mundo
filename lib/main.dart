@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MaterialApp(
       theme:
@@ -10,75 +11,107 @@ void main() => runApp(MaterialApp(
       home: SplashScreen(),
     ));
 
+SharedPreferences localStorage;
+
+TextEditingController emailController = new TextEditingController();
+TextEditingController pwdController = new TextEditingController();
+
 class SplashScreen extends StatefulWidget {
+  static Future init() async {
+    localStorage = await SharedPreferences.getInstance();
+  }
+
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
-  void initState() {
-    super.initState();
-    Timer(Duration(seconds: 5), () => print("Splash Done!"));
-  }
-
-  @override
   Widget build(BuildContext context) {
+    // TODO: implement build
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          Container(
-            decoration: BoxDecoration(color: Colors.blueGrey),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+      body: Padding(
+        padding: const EdgeInsets.all(30.0),
+        child: Center(
+          child: Column(
             children: <Widget>[
-              Expanded(
-                flex: 2,
-                child: Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      CircleAvatar(
-                        backgroundColor: Colors.white,
-                        radius: 50.0,
-                        child: Icon(
-                          Icons.shopping_cart,
-                          color: Colors.greenAccent,
-                          size: 50.0,
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 10.0),
-                      ),
-                      Text(
-                        "MULTICOOP AHORRO Y CRÉDITO",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.bold),
-                      )
-                    ],
-                  ),
-                ),
+              Padding(
+                padding: EdgeInsets.only(top: 200),
               ),
-              Expanded(
-                flex: 1,
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 10),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                    Text(
+                      "Email Id:",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                     ),
-                    Padding(padding: EdgeInsets.only(top: 20.0)),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    TextField(
+                        controller: emailController,
+                        obscureText: false,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            fillColor: Color(0xfff3f3f4),
+                            filled: true))
                   ],
                 ),
-              )
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Password :",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    TextField(
+                        controller: pwdController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            fillColor: Color(0xfff3f3f4),
+                            filled: true))
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 50),
+              ),
+              RaisedButton(
+                onPressed: save,
+                child: Text('Login'),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 50),
+              ),
+              if (localStorage != null)
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Text(
+                    "User Logged in!!! ->  Email Id: ${localStorage.get('email')}  Password: ${localStorage.get('password')}",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
             ],
-          )
-        ],
+          ),
+        ),
       ),
     );
+  }
+
+  save() async {
+    await SplashScreen.init();
+    localStorage.setString('email', emailController.text.toString());
+    localStorage.setString('password', pwdController.text.toString());
   }
 }
